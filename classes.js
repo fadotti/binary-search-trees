@@ -65,12 +65,6 @@ class Tree {
     this.#addValue(value, this.root);
   }
 
-  #checkNodeLevel(value, node, i) {
-    if (value == node.value) return i
-    if (value > node.value) return this.#checkNodeLevel(value, node.right, ++i)
-    if (value < node.value) return this.#checkNodeLevel(value, node.left, ++i)
-  }
-
   #deleteValue(value, node, predecessor, right) {
     if (value == node.value && node.left == null && node.right == null) {
       if (predecessor == null) {
@@ -88,26 +82,51 @@ class Tree {
     }
 
     if (value == node.value && node.left != null && node.right == null) {
-      node = node.left;
-      return node
+      if (predecessor == null) {
+        this.root = node.left;
+        return 
+      }
+      if (right == 1) {
+        predecessor.right = node.left;
+        return
+      }
+      if (right == 0) {
+        predecessor.left = node.left;
+        return
+      }
     }
     if (value == node.value && node.left == null && node.right != null) {
-      node = node.right;
-      return node
+      if (predecessor == null) {
+        this.root = node.right;
+        return 
+      }
+      if (right == 1) {
+        predecessor.right = node.right;
+        return
+      }
+      if (right == 0) {
+        predecessor.left = node.right;
+        return
+      }
     }
 
     //using the inorder successor when the node has two children
     if (value == node.value && node.left != null && node.right != null) {
       let successor = node.right;
       let predecessor = node;
-      while (successor.left != null) {
-        predecessor = successor;
-        successor = successor.left;
-      }
-      node.value = successor.value
-      if (successor.right != null) {
+      if (successor.left == null) {
+        node.value = successor.value;
+        node.right = successor.right
+      } else {
+        while (successor.left != null) {
+          predecessor = successor;
+          successor = successor.left;
+        }
+        node.value = successor.value;
+        if (successor.right != null) {
         predecessor.left = successor.right;
-      }
+        }
+      }      
       return
     }
 
@@ -121,13 +140,13 @@ class Tree {
 }
 
 let test = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
-console.dir(test, {depth: null})
-test.prettyPrint()
+// console.dir(test, {depth: null})
+// test.prettyPrint()
 test.insert(3000)
 console.dir(test, {depth: null})
 test.prettyPrint()
-test.deleteItem(3000)
-console.dir(test, {depth: null})
+test.deleteItem(8)
+// console.dir(test, {depth: null})
 test.prettyPrint()
 
 // console.log([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
