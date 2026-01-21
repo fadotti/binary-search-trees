@@ -137,6 +137,27 @@ class Tree {
   deleteItem(value) {
     this.#deleteValue(value, this.root, null, null);
   }
+
+  #findValue(value, node) {
+    if (value > node.value) {
+      if (node.right == null) return
+      if (node.right != null) return this.#findValue(value, node.right)
+    }
+    if (value < node.value) {
+      if (node.left == null) return
+      if (node.left != null) return this.#findValue(value, node.left)
+    }
+    if (value == node.value) return node
+  }
+
+  find(value) {
+    return this.#findValue(value, this.root);
+  }
+
+  levelOrderForEach(callback) {
+    if (typeof callback != 'function') throw Error('levelorderForEach must be passed a callback function');
+    let nodeQueue = [];
+  }
 }
 
 let test = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
@@ -145,9 +166,9 @@ let test = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
 test.insert(3000)
 console.dir(test, {depth: null})
 test.prettyPrint()
-test.deleteItem(8)
-// console.dir(test, {depth: null})
+test.deleteItem(67)
 test.prettyPrint()
+// console.dir(test, {depth: null})
 
 // console.log([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
 //               .sort((a, b) => a - b)
