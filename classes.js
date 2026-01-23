@@ -154,9 +154,54 @@ class Tree {
     return this.#findValue(value, this.root);
   }
 
+  #getNodeQueue(callback, node, nodeQueue) {
+    if (this.root == null) return
+    nodeQueue.push(node);
+    while (nodeQueue.length > 0) {
+      const currentNode = nodeQueue[0];
+      if (currentNode.left != null) nodeQueue.push(currentNode.left);
+      if (currentNode.right != null) nodeQueue.push(currentNode.right);
+      callback(currentNode);
+      nodeQueue.shift();
+    }
+  }
+
   levelOrderForEach(callback) {
     if (typeof callback != 'function') throw Error('levelorderForEach must be passed a callback function');
-    let nodeQueue = [];
+    this.#getNodeQueue(callback, this.root, []);
+  }
+
+  #printInorderWrapper(callback, node) {
+    if (node == null) return
+    this.#printInorderWrapper(callback, node.left);
+    callback(node);
+    this.#printInorderWrapper(callback, node.right);
+  }
+
+  inOrderForEach(callback) {
+    this.#printInorderWrapper(callback, this.root);
+  }
+
+  #printPreorderWrapper(callback, node) {
+    if (node == null) return
+    callback(node);
+    this.#printPreorderWrapper(callback, node.left);
+    this.#printPreorderWrapper(callback, node.right);
+  }
+
+  preOrderForEach(callback) {
+    this.#printPreorderWrapper(callback, this.root);
+  }
+
+  #printPostorderWrapper(callback, node) {
+    if (node == null) return
+    this.#printPostorderWrapper(callback, node.left);
+    this.#printPostorderWrapper(callback, node.right);
+    callback(node);
+  }
+
+  postOrderForEach(callback) {
+    this.#printPostorderWrapper(callback, this.root);
   }
 }
 
@@ -168,6 +213,12 @@ console.dir(test, {depth: null})
 test.prettyPrint()
 test.deleteItem(67)
 test.prettyPrint()
+// test.levelOrderForEach((node) => {
+//   console.log(node.value);
+// })
+test.postOrderForEach((node) => {console.log(node.value)})
+console.log(' ')
+test.postOrderForEach((node) => {console.log(node.value * 2)})
 // console.dir(test, {depth: null})
 
 // console.log([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
