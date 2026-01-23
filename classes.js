@@ -1,3 +1,5 @@
+export {Tree}
+
 class Node {
   constructor(value, leftChild, rightChild) {
     this.value = value;
@@ -203,27 +205,61 @@ class Tree {
   postOrderForEach(callback) {
     this.#printPostorderWrapper(callback, this.root);
   }
+  #countEdges(value, node, i) {
+    if (value > node.value) {
+      if (node.right == null) return
+      if (node.right != null) return this.#countEdges(value, node.right, ++i)
+    }
+    if (value < node.value) {
+      if (node.left == null) return
+      if (node.left != null) return this.#countEdges(value, node.left, ++i)
+    }
+    if (value == node.value) return i
+  }
+
+  height(value) {
+    let breadthFirstValues = [];
+    let inputNode = this.find(value);
+    this.#getNodeQueue((node) => breadthFirstValues.push(node), inputNode, []);
+    const leafNodeValue = breadthFirstValues.at(-1).value;
+    return this.#countEdges(leafNodeValue, inputNode, 0)
+  }
+
+  depth(value) {
+    return this.#countEdges(value, this.root, 0)
+  }
+
+  isBalanced() {
+    let output = true;
+
+    this.postOrderForEach((node) => {
+      if (node.left == null && node.right == null) return
+      if (node.left == null && node.right != null) {
+        if (this.height(node.right.value) > 0) {
+          output = false;
+          return
+        }
+      }
+      if (node.right == null && node.left != null) {
+        if (this.height(node.left.value) > 0) {
+          output = false;
+          return
+        }
+      }
+      if (node.left != null && node.right != null) {
+        if (Math.abs(this.height(node.left.value) - this.height(node.right.value)) > 1) {
+          output = false;
+          return
+        }
+      }
+    })
+    return output
+  }
+
+  rebalance() {
+    if (this.isBalanced()) return
+    let newInputArray = [];
+    this.inOrderForEach((node) => newInputArray.push(node.value));
+    this.root = this.#buildTree(newInputArray);
+  }
 }
-
-let test = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
-// console.dir(test, {depth: null})
-// test.prettyPrint()
-test.insert(3000)
-console.dir(test, {depth: null})
-test.prettyPrint()
-test.deleteItem(67)
-test.prettyPrint()
-// test.levelOrderForEach((node) => {
-//   console.log(node.value);
-// })
-test.postOrderForEach((node) => {console.log(node.value)})
-console.log(' ')
-test.postOrderForEach((node) => {console.log(node.value * 2)})
-// console.dir(test, {depth: null})
-
-// console.log([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
-//               .sort((a, b) => a - b)
-//               .filter((element, index, array) => {
-//                 if (index == array.length - 1) return true //if last element return true
-//                 if (element != array[index + 1]) return true //else return true if next element is not equal to current one
-//               }))
